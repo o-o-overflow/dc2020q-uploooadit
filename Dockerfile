@@ -7,6 +7,10 @@ RUN apt-get update \
 
 RUN mkdir -p /var/uploads
 
-COPY app.py .
+WORKDIR /app
 
-CMD ["gunicorn", "--access-logfile=-", "--bind=0.0.0.0:8080", "--keep-alive=60", "--strip-header-spaces", "--worker-class=gevent", "--workers=1", "app:app"]
+COPY app.py launch_wrapper.sh ./
+COPY bin/haproxy /usr/local/sbin/
+COPY haproxy.cfg /etc/haproxy/
+
+CMD ["./launch_wrapper.sh"]

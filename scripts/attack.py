@@ -16,7 +16,7 @@ Transfer-Encoding:\x0bchunked
 
 def request(content):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.connect(("127.0.0.1", 8000))
+    server.connect(("127.0.0.1", 8080))
     print(content)
     print()
 

@@ -7,7 +7,7 @@ import requests
 import uuid
 
 SECRET = b"Congratulations!\nOOO{some really long string which blah blah blah}\n"
-URL = "http://127.0.0.1:8000/files/"
+URL = "http://127.0.0.1:8080/files/"
 USER_AGENT = "victim"
 
 
