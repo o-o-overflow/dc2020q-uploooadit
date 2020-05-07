@@ -5,12 +5,22 @@ RUN apt-get update \
     && pip3 install -U pip setuptools \
     && pip install flask gunicorn[gevent]
 
-RUN mkdir -p /var/uploads
+COPY app.py /app/
+COPY launch_wrapper.sh /sbin/
+COPY config/gunicorn.conf.py /etc/
 
-WORKDIR /app
+RUN chmod 444 /app/app.py \
+    && chmod 500 /sbin/launch_wrapper.sh \
+    && chmod 600 /etc/gunicorn.conf.py \
+    && mkdir --mode=111 --parents /home/haproxy \
+    && mkdir --mode=733 --parents /var/log/gunicorn /var/uploads \
+    && useradd -UM app \
+    && useradd -UMr haproxy
 
-COPY app.py launch_wrapper.sh ./
-COPY bin/haproxy /usr/local/sbin/
-COPY haproxy.cfg /etc/haproxy/
+COPY --chown=haproxy:haproxy bin/haproxy config/haproxy.cfg /home/haproxy/
 
-CMD ["./launch_wrapper.sh"]
+RUN chmod 500 /home/haproxy/haproxy \
+    && chmod 400 /home/haproxy/haproxy.cfg
+
+WORKDIR app
+CMD ["launch_wrapper.sh"]

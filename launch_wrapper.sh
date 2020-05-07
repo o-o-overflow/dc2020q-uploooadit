@@ -1,24 +1,13 @@
 #!/bin/bash
 
-gunicorn \
-  --access-logfile=access.log \
-  --bind=127.0.0.1:8000 \
-  --capture-output \
-  --daemon \
-  --error-logfile=error.log \
-  --keep-alive=60 \
-  --strip-header-spaces \
-  --worker-class=gevent \
-  --worker-tmp-dir=/dev/shm \
-  --workers=1 \
-  app:app
+gunicorn --config=/etc/gunicorn.conf.py app:app
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start gunicorn: $status"
   exit $status
 fi
 
-haproxy -f /etc/haproxy -D
+su haproxy -c '/home/haproxy/haproxy -f /home/haproxy/haproxy.cfg -D'
 status=$?
 if [ $status -ne 0 ]; then
   echo "Failed to start haproxy: $status"

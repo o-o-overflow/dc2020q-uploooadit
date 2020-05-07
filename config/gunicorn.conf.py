@@ -1,0 +1,13 @@
+accesslog = "/var/log/gunicorn/1976180975_access.log"
+bind = "127.0.0.1:8000"
+capture_output = True
+chdir = "/app"
+daemon = True
+errorlog = "/var/log/gunicorn/1976180975_error.log"
+group = "app"
+keepalive = 60
+strip_header_spaces = True
+user = "app"
+worker_class = "gevent"
+worker_tmp_dir = "/dev/shm"
+workers = 1
