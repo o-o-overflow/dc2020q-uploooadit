@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 RUN apt-get update \
     && apt-get install -y --no-install-recommends python3-pip python3-wheel \
     && pip3 install -U pip setuptools \
-    && pip install flask gunicorn[gevent]
+    && pip install flask gunicorn[gevent] python-daemon requests
 
 COPY app.py /app/
 COPY launch_wrapper.sh /sbin/
@@ -13,13 +13,16 @@ RUN chmod 444 /app/app.py \
     && chmod 500 /sbin/launch_wrapper.sh \
     && chmod 600 /etc/gunicorn.conf.py \
     && mkdir --mode=111 --parents /home/haproxy \
+    && mkdir --mode=111 --parents /home/invoker \
     && mkdir --mode=733 --parents /var/log/gunicorn /var/uploads \
     && useradd -UM app \
-    && useradd -UMr haproxy
+    && useradd -UMr haproxy \
+    && useradd -UM invoker
 
 COPY --chown=haproxy:haproxy bin/haproxy config/haproxy.cfg /home/haproxy/
+COPY --chown=invoker:invoker scripts/invoker.py /home/invoker/
 
-RUN chmod 500 /home/haproxy/haproxy \
+RUN chmod 500 /home/haproxy/haproxy /home/invoker/invoker.py \
     && chmod 400 /home/haproxy/haproxy.cfg
 
 WORKDIR app

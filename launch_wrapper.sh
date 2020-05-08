@@ -14,6 +14,13 @@ if [ $status -ne 0 ]; then
   exit $status
 fi
 
+su invoker -c '/home/invoker/invoker.py --daemon' &
+status=$?
+if [ $status -ne 0 ]; then
+  echo "Failed to start invoker: $status"
+  exit $status
+fi
+
 echo "Started!"
 
 while sleep 60; do
@@ -21,7 +28,9 @@ while sleep 60; do
   GUNICORN_STATUS=$?
   ps aux |grep haproxy |grep -q -v grep
   HAPROXY_STATUS=$?
-  if [ $GUNICORN_STATUS -ne 0 -o $HAPROXY_STATUS -ne 0 ]; then
+  ps aux |grep invoker |grep -q -v grep
+  INVOKER_STATUS=$?
+  if [ $GUNICORN_STATUS -ne 0 -o $HAPROXY_STATUS -ne 0 -o $INVOKER_STATUS -ne 0 ]; then
     echo "One of the processes has already exited."
     exit 1
   fi

@@ -1,14 +1,27 @@
 #!/usr/bin/env python3
+import argparse
 import sys
 import time
 import traceback
-
-import requests
 import uuid
+
+import daemon
+import requests
 
 SECRET = b"Congratulations!\nOOO{some really long string which blah blah blah}\n"
 URL = "http://127.0.0.1:8080/files/"
-USER_AGENT = "victim"
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--daemon", action="store_true")
+    arguments = parser.parse_args()
+
+    if arguments.daemon:
+        with daemon.DaemonContext():
+            run_loop()
+    else:
+        run_loop()
 
 
 def put_file():
@@ -17,7 +30,7 @@ def put_file():
         data=SECRET,
         headers={
             "Content-Type": "text/plain",
-            "User-Agent": "victim",
+            "User-Agent": "invoker",
             "X-guid": str(uuid.uuid4()),
         },
         timeout=1,
@@ -30,7 +43,7 @@ def put_file():
         print(response)
 
 
-def main():
+def run_loop():
     while True:
         try:
             put_file()
