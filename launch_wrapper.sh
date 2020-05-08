@@ -34,4 +34,6 @@ while sleep 60; do
     echo "One of the processes has already exited."
     exit 1
   fi
+  # Clean up files that are older than 3 minutes
+  find /var/uploads/ -mmin +3 -type f -delete
 done
