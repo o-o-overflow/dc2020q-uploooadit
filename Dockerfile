@@ -19,10 +19,11 @@ RUN chmod 444 /app/app.py \
     && useradd -UMr haproxy \
     && useradd -UM invoker
 
-COPY --chown=haproxy:haproxy bin/haproxy config/haproxy.cfg /home/haproxy/
+COPY --chown=haproxy:haproxy bin/haproxy config/haproxy.cfg errorfiles/* /home/haproxy/
 COPY --chown=invoker:invoker scripts/invoker.py /home/invoker/
 
 RUN chmod 500 /home/haproxy/haproxy /home/invoker/invoker.py \
+    && chmod 400 /home/haproxy/*.http \
     && chmod 400 /home/haproxy/haproxy.cfg
 
 WORKDIR app
