@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import socket
+import ssl
 import sys
 
 
@@ -13,24 +14,25 @@ Transfer-Encoding:\x0bchunked
 
 """
 
+HOSTNAME = "uploooadit.oooverflow.io"
 
-def request(content):
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.connect(("127.0.0.1", 8080))
+
+def request(content, hostname=HOSTNAME, port=443):
     print(content)
     print()
 
-    assert server.send(content) == len(content)
-    data = server.recv(1024)
-    while len(data) > 0:
-        print(data.decode("utf-8"))
-        data = server.recv(1024)
-
-    try:
-        server.shutdown(socket.SHUT_RDWR)
-    except:
-        pass
-    server.close()
+    context = ssl.create_default_context()
+    with socket.create_connection((hostname, port)) as raw_socket:
+        with context.wrap_socket(raw_socket, server_hostname=hostname) as server:
+            assert server.send(content) == len(content)
+            data = server.recv(1024)
+            while len(data) > 0:
+                print(data.decode("utf-8"))
+                data = server.recv(1024)
+        try:
+            raw_socket.shutdown(socket.SHUT_RDWR)
+        except:
+            pass
 
 
 def clte(payload):

@@ -1,12 +1,10 @@
-accesslog = "/var/log/gunicorn/1976180975_access.log"
+accesslog = "-"
 bind = "127.0.0.1:8000"
 capture_output = True
 chdir = "/app"
-daemon = True
-errorlog = "/var/log/gunicorn/1976180975_error.log"
+errorlog = "-"
 group = "app"
 keepalive = 60
-strip_header_spaces = True
 user = "app"
 worker_class = "gevent"
 worker_tmp_dir = "/dev/shm"

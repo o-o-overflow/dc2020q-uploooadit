@@ -1,20 +1,20 @@
 FROM ubuntu:18.04
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python3-pip python3-wheel \
+    && apt-get install -y --no-install-recommends curl python3-pip python3-wheel supervisor \
     && pip3 install -U pip setuptools \
-    && pip install flask gunicorn[gevent] python-daemon requests
+    && pip install flask gunicorn[gevent]==20.0.0 requests
 
 COPY app.py /app/
-COPY launch_wrapper.sh /sbin/
 COPY config/gunicorn.conf.py /etc/
+COPY config/supervisord.conf /etc/supervisor/conf.d/
 
 RUN chmod 444 /app/app.py \
-    && chmod 500 /sbin/launch_wrapper.sh \
-    && chmod 600 /etc/gunicorn.conf.py \
+    && chmod 400 /etc/gunicorn.conf.py \
+    && chmod 400 /etc/supervisor/conf.d/supervisord.conf \
     && mkdir --mode=111 --parents /home/haproxy \
     && mkdir --mode=111 --parents /home/invoker \
-    && mkdir --mode=733 --parents /var/log/gunicorn /var/uploads \
+    && mkdir --mode=733 --parents /var/uploads \
     && useradd -UM app \
     && useradd -UMr haproxy \
     && useradd -UM invoker
@@ -27,4 +27,4 @@ RUN chmod 500 /home/haproxy/haproxy /home/invoker/invoker.py \
     && chmod 400 /home/haproxy/haproxy.cfg
 
 WORKDIR app
-CMD ["launch_wrapper.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

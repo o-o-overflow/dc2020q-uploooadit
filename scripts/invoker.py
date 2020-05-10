@@ -5,7 +5,6 @@ import time
 import traceback
 import uuid
 
-import daemon
 import requests
 
 SECRET = b"Congratulations!\nOOO{some really long string which blah blah blah}\n"
@@ -16,12 +15,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--daemon", action="store_true")
     arguments = parser.parse_args()
-
-    if arguments.daemon:
-        with daemon.DaemonContext():
-            run_loop()
-    else:
-        run_loop()
+    run_loop()
 
 
 def put_file():
