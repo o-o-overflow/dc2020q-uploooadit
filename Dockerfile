@@ -3,18 +3,17 @@ FROM ubuntu:18.04
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl python3-pip python3-wheel supervisor \
     && pip3 install -U pip setuptools \
-    && pip install flask gunicorn[gevent]==20.0.0 requests
+    && pip install boto3 flask gunicorn[gevent]==20.0.0 requests
 
-COPY app.py /app/
+COPY app.py store.py /app/
 COPY config/gunicorn.conf.py /etc/
 COPY config/supervisord.conf /etc/supervisor/conf.d/
 
-RUN chmod 444 /app/app.py \
+RUN chmod 444 /app/app.py /app/store.py \
     && chmod 400 /etc/gunicorn.conf.py \
     && chmod 400 /etc/supervisor/conf.d/supervisord.conf \
     && mkdir --mode=111 --parents /home/haproxy \
     && mkdir --mode=111 --parents /home/invoker \
-    && mkdir --mode=733 --parents /var/uploads \
     && useradd -UM app \
     && useradd -UMr haproxy \
     && useradd -UM invoker

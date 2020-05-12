@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import os
 import sys
 import time
 import traceback
@@ -7,7 +8,7 @@ import uuid
 
 import requests
 
-SECRET = b"Congratulations!\nOOO{some really long string which blah blah blah}\n"
+SECRET = b"Congratulations!\nOOO{That girl thinks she's the queen of the neighborhood/She's got the hottest trike in town/That girl, she holds her head up so high}\n"
 URL = "http://127.0.0.1:8080/files/"
 
 

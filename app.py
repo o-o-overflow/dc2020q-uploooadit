@@ -3,18 +3,18 @@ import re
 
 from flask import Flask, abort, request
 
+import store
+
 GUID_RE = re.compile(
     r"\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\Z"
 )
-UPLOAD_DIRECTORY = "/var/uploads/"
 
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 512
+filestore = store.S3Store()
 
-
-@app.route("/", methods=["GET"])
-def root():
-    return "", 204
+# Uncomment the following line for simpler local testing of this service
+# filestore = store.LocalStore()
 
 
 @app.route("/files/", methods=["POST"])
@@ -26,8 +26,7 @@ def add_file():
     if not GUID_RE.match(guid):
         abort(422)
 
-    with open(os.path.join(UPLOAD_DIRECTORY, guid), "wb") as fp:
-        fp.write(request.data)
+    filestore.save(guid, request.data)
     return "", 201
 
 
@@ -36,9 +35,12 @@ def get_file(guid):
     if not GUID_RE.match(guid):
         abort(422)
 
-    filepath = os.path.join(UPLOAD_DIRECTORY, guid)
-    if not os.path.isfile(filepath):
+    try:
+        return filestore.read(guid), {"Content-Type": "text/plain"}
+    except store.NotFound:
         abort(404)
 
-    with open(filepath) as fp:
-        return fp.read(), {"Content-Type": "text/plain"}
+
+@app.route("/", methods=["GET"])
+def root():
+    return "", 204
