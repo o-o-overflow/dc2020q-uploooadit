@@ -7,7 +7,6 @@ make it easier to test locally without needing access to an S3 bucket.
 
 """
 import os
-import tempfile
 
 import boto3
 import botocore
@@ -19,6 +18,7 @@ class NotFound(Exception):
 
 class LocalStore:
     def __init__(self):
+        import tempfile
         self.upload_directory = tempfile.mkdtemp()
 
     def read(self, key):
