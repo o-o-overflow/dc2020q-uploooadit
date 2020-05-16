@@ -51,7 +51,7 @@ class S3Store:
         try:
             response = self.s3.get_object(Bucket=self.bucket, Key=key)
         except botocore.exceptions.ClientError as exception:
-            if exception.response["HTTPStatusCode"] == 403:
+            if exception.response["ResponseMetadata"]["HTTPStatusCode"] == 403:
                 raise NotFound
             # No other exceptions encountered during testing
         return response["Body"].read()

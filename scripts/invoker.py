@@ -44,7 +44,7 @@ def run_loop():
             put_file()
         except Exception:
             traceback.print_exc()
-        time.sleep(2)
+        time.sleep(0.5)
 
 
 if __name__ == "__main__":
