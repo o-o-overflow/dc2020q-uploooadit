@@ -13,6 +13,15 @@ def main():
     session = boto3.Session(profile_name="ooo")
     s3 = session.client("s3")
 
+    ec2 = session.resource("ec2")
+    network_acl = ec2.NetworkAcl("acl-053f40ce8fec8e8d8")
+    for entry in network_acl.entries:
+        if entry["Egress"]:
+            continue
+        if 100 <= entry["RuleNumber"] < 1000:
+            print(f"Unbanning {entry['CidrBlock']}")
+            network_acl.delete_entry(Egress=False, RuleNumber=entry["RuleNumber"])
+
     ip_counter = Counter()
     max_timestamp = "0"
     min_timestamp = "3"
@@ -40,34 +49,20 @@ def main():
     print(f"Duration: {seconds} seconds")
     assert seconds > 300
 
-    ban = set()
+    rule_number = 100
     for ip, count in ip_counter.most_common(10):
         rate = count / seconds
         if rate > 1:
-            print(f"{rate:5.02f} rps\t{ip}")
-            ban.add(f"{ip}/32")
-
-    last_rule = 0
-
-    ec2 = session.resource("ec2")
-    network_acl = ec2.NetworkAcl("acl-053f40ce8fec8e8d8")
-    for entry in network_acl.entries:
-        if entry["Egress"]:
-            continue
-        if 100 <= entry["RuleNumber"] < 1000:
-            last_rule = max(last_rule, entry["RuleNumber"])
-            if entry["CidrBlock"] in ban:
-                ban.remove(entry["CidrBlock"])
-
-    for i, cidr in enumerate(ban):
-        rule_number = i + 1 + last_rule
-        network_acl.create_entry(
-            CidrBlock=cidr,
-            Egress=False,
-            Protocol="-1",
-            RuleAction="deny",
-            RuleNumber=rule_number,
-        )
+            cidr = f"{ip}/32"
+            print(f"Banning {cidr:>17s}\t{rate:5.02f} rps")
+            network_acl.create_entry(
+                CidrBlock=cidr,
+                Egress=False,
+                Protocol="-1",
+                RuleAction="deny",
+                RuleNumber=rule_number,
+            )
+            rule_number += 1
 
 
 if __name__ == "__main__":
