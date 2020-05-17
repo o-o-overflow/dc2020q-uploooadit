@@ -2,6 +2,7 @@
 import socket
 import ssl
 import sys
+import uuid
 
 import requests
 
@@ -16,7 +17,7 @@ Transfer-Encoding:\x0bchunked
 
 """
 
-GUID = "aa7e4586-d547-4a4a-a088-fc208a437a6f"
+GUID = str(uuid.uuid4())
 HOSTNAME = "uploooadit.oooverflow.io"
 
 
