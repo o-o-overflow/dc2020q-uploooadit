@@ -9,6 +9,7 @@ import uuid
 import requests
 
 SECRET = b"Congratulations!\nOOO{That girl thinks she's the queen of the neighborhood/She's got the hottest trike in town/That girl, she holds her head up so high}\n"
+SLEEP_TIME = float(os.environ["SLEEP_TIME"])
 URL = "http://127.0.0.1:8080/files/"
 
 
@@ -44,7 +45,7 @@ def run_loop():
             put_file()
         except Exception:
             traceback.print_exc()
-        time.sleep(0.01)
+        time.sleep(SLEEP_TIME)
 
 
 if __name__ == "__main__":
